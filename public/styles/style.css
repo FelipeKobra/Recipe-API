@@ -1,0 +1,54 @@
+ul.jumbotron > li {
+    margin: 1.5vh
+}
+
+.filterCrimson {
+    filter: invert(17%) sepia(82%) saturate(1270%) hue-rotate(338deg) brightness(102%) contrast(100%);
+}
+
+.filterOrange {
+    filter: invert(59%) sepia(89%) saturate(1428%) hue-rotate(360deg) brightness(104%) contrast(108%);
+}
+
+.filterGreen{
+    filter: invert(16%) sepia(79%) saturate(3101%) hue-rotate(101deg) brightness(97%) contrast(104%);
+}
+
+.filterSeaGreen{
+    filter: invert(60%) sepia(62%) saturate(290%) hue-rotate(106deg) brightness(95%) contrast(93%);
+}
+
+html, body {
+    position: relative;
+    min-height: 100%;
+  }
+  
+  .container-fluid.footer {
+    position: absolute;
+    width: 100%;  
+    bottom: 0;
+  }
+
+  .imgShow{
+    margin-left: 15vh;
+    margin-right: 15vh
+  }
+
+
+@media (max-width:1200px){
+    .hand {
+        display: none;
+    }
+
+
+
+    #menu{
+        display: hidden;
+    }
+
+    .imgShow{
+        margin: 0;
+    }
+
+
+}

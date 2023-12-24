@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt" >
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kobra Blog</title>
+    <link rel="stylesheet" href="/styles/style.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body class="bg-body" >
+
+    <nav class="navbar navbar-expand-lg bg-light rounded-bottom-3 border-4 border-light mb-5">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="/"><svg height="8vh" width="8vh" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+          viewBox="0 0 504.125 504.125" xml:space="preserve">
+       <path style="fill:#3A7F0D;" d="M339.772,0c0,0,44.536,108.954-146.337,182.138C89.719,221.893,10.059,323.789,105.173,481.193
+         c7.877-70.357,41.653-225.485,186.888-260.884c0,0-135.176,50.546-147.117,279.347c69.459,9.752,232.361,16.305,280.726-125.062
+         C489.536,187.817,339.772,0,339.772,0z"/>
+       <path style="fill:#49A010;" d="M145.007,498.704c147.456-58.849,254.748-196.71,269.556-361.283C384.418,56.107,339.772,0,339.772,0
+         s44.536,108.954-146.337,182.138C89.719,221.893,10.059,323.789,105.173,481.193c7.877-70.357,41.653-225.485,186.888-260.884
+         C292.053,220.31,157.279,270.73,145.007,498.704z"/>
+       <circle style="fill:#3A7F0D;" cx="90.459" cy="171.985" r="13.785"/>
+       <g>
+         <circle style="fill:#49A010;" cx="133.782" cy="158.2" r="9.846"/>
+         <circle style="fill:#49A010;" cx="124.921" cy="64.662" r="24.615"/>
+         <circle style="fill:#49A010;" cx="200.736" cy="120.785" r="7.877"/>
+         <circle style="fill:#49A010;" cx="266.713" cy="76.477" r="22.646"/>
+       </g>
+       </svg></a>
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon  "></span>
+        </button>
+        <div class="collapse navbar-collapse text-end" id="navbarNav">
+          <ul class="navbar-nav">
+            <li class="nav-item my-3">
+              <a class="text-decoration-none  p-3 <%= locals.fwHome %>"  style="color: black;" href="/">Home</a>
+            </li>
+            <li class="nav-item my-3">
+              <a class="text-decoration-none  p-3 <%= locals.fwRecipes %> " style="color: black;" href="/recipes">Encontre Receitas!</a>
+            </li>
+            </ul>
+        </div>
+      </div>
+    </nav>

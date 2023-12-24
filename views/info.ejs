@@ -1,0 +1,44 @@
+<%- include(__dirname + '/views/partials/header.ejs') %>
+
+<% function capitalizeWords(str) { %>
+  <%  return str.replace(/\w\S*/g, (w) => (w.replace(/^\w/, (c) => c.toUpperCase()))); %>
+<% } %>
+
+<div class="container-fluid justify-content-center align-self-center text-center">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4 text-bg-dark rounded-2"><%= dish.title %></h1>
+            <img class="rounded-5 img-thumbnail border-4 border-dark bg-dark-subtle" src="<%= dish.image %>" alt="<%= dish.title %> image">
+        </div>
+    </div>
+</div>
+
+
+<div class="container justify-content-center align-self-center text-center">
+    <div class="row">
+        <div class="col-12 col-lg-5 mx-auto">
+            <h2 class="my-4 text-bg-dark rounded-2 fs-1">Ingredientes</h2>
+            <ul  class="text-center fs-5">
+                <% for (var i=0;i< ingredList.length;i++){ %>
+                    <li class="list-unstyled rounded-2  <%= i % 2 === 0 ? 'text-bg-dark' : '' %>" style="margin-top: 1vh; margin-right: 2vw;"><%= capitalizeWords(ingredList[i].name) %> - <%= ingredList[i].value %> <%= ingredList[i].unit %></li>
+                <% } %>
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+<div class="container justify-content-center align-self-center text-center">
+    <div class="row">
+        <div class="col-12 col-lg-5 mx-auto">
+            <h2 class="text-bg-dark rounded-2 fs-1">Modo de Preparo:</h2>
+            <ol class="text-center fs-5">
+                <% for (var x=0;x< stepList.length;x++){ %>
+                    <li class="rounded-2" style="margin-top: 6vh;"><%= stepList[x] %></li>
+                <% } %>
+            </ol>
+        </div>
+    </div>
+</div>
+
+<%- include(__dirname + '/views/partials/footer.ejs') %>
