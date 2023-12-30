@@ -18,9 +18,9 @@
     <div class="row">
         <div class="col-12 col-lg-5 mx-auto">
             <h2 class="my-4 text-bg-dark rounded-2 fs-1">Ingredientes</h2>
-            <ul  class="text-center fs-5">
+            <ul  class="text-center fs-5 d-flex flex-column p-0 align-content-center justify-content-center">
                 <% for (var i=0;i< ingredList.length;i++){ %>
-                    <li class="list-unstyled rounded-2  <%= i % 2 === 0 ? 'text-bg-dark' : '' %>" style="margin-top: 1vh; margin-right: 2vw;"><%= capitalizeWords(ingredList[i].name) %> - <%= ingredList[i].value %> <%= ingredList[i].unit %></li>
+                    <li class="list-unstyled rounded-2  <%= i % 2 === 0 ? 'text-bg-dark' : '' %>" style="margin-top: 1vh;"><%= capitalizeWords(ingredList[i].name) %> - <%= ingredList[i].value %> <%= ingredList[i].unit %></li>
                 <% } %>
             </ul>
         </div>

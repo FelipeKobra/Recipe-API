@@ -40,8 +40,6 @@ html, body {
         display: none;
     }
 
-
-
     #menu{
         display: hidden;
     }
@@ -50,5 +48,10 @@ html, body {
         margin: 0;
     }
 
+}
 
+@media (max-width:992px){
+    .foot {
+        display: none;
+    }
 }

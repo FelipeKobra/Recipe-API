@@ -4,9 +4,9 @@
     "bing-translate-api": "^2.10.0",
     "body-parser": "^1.20.2",
     "bootstrap": "^5.3.2",
+    "dotenv": "^16.3.1",
     "ejs": "^3.1.9",
     "express": "^4.18.2",
-    "jquery": "^3.7.1",
     "path": "^0.12.7",
     "url": "^0.11.3"
   },

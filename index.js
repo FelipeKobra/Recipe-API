@@ -1,9 +1,9 @@
+import "dotenv/config";
 import express, { query } from "express";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
 import bodyParser from "body-parser";
 import axios from "axios";
-import jQuery from "jquery";
 import bingTranslateApi from "bing-translate-api";
 const { translate } = bingTranslateApi;
 
@@ -157,6 +157,18 @@ const typeBR = [
   " Bebidas Alcoólicas",
 ];
 
+const renderInfo = {
+  cuisine: cuisine,
+  cuisineBR: cuisineBR,
+  diet: diet,
+  dietBR: dietBR,
+  intolerances: intolerances,
+  intolerancesBR: intolerancesBR,
+  type: type,
+  typeBR: typeBR,
+  fwRecipes: "fw-bold text-success",
+};
+
 app.locals.__dirname = __dirname;
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname + "/public"));
@@ -169,17 +181,7 @@ app.get("/", (req, res) => {
 
 app.get("/recipes", async (req, res) => {
   try {
-    res.render("recipes.ejs", {
-      cuisine: cuisine,
-      cuisineBR: cuisineBR,
-      diet: diet,
-      dietBR: dietBR,
-      intolerances: intolerances,
-      intolerancesBR: intolerancesBR,
-      type: type,
-      typeBR: typeBR,
-      fwRecipes: "fw-bold text-success",
-    });
+    res.render("recipes.ejs", { renderInfo });
   } catch (error) {
     console.error("Failed to make request:", error.message);
     res.render("index.ejs", {
@@ -193,66 +195,29 @@ app.post("/recipes", async (req, res) => {
     let translatedQuery = req.body.queryRes;
 
     if (req.body.queryRes) {
-      const translatedText = await translate(req.body.queryRes, null, "en");
-      translatedQuery = translatedText.translation;
+      translatedQuery = await traduzir(req.body.queryRes, "en");
     }
 
-    const complexSearchResponse = await axios.get(
-      `https://api.spoonacular.com/recipes/complexSearch?apiKey=726d686f92dd401d83de88ca56e86763&query=${translatedQuery}&cuisine=${req.body.cuisineRes}&diet=${req.body.dietRes}&intolerances=${req.body.intolerancesRes}&type=${req.body.typeRes}`
+    const complexSearchResult = await spoonCall.recipeComplex(
+      translatedQuery,
+      req.body.cuisineRes,
+      req.body.dietRes,
+      req.body.intolerancesRes,
+      req.body.typeRes
     );
 
-    const complexSearchResult = complexSearchResponse.data;
-      console.log(complexSearchResult)
-    const names = [];
-    const photos = [];
-    const ids = [];
-
-    for (let i = 0; i < complexSearchResult.results.length; i++) {
-      let translatedTitle;
-      try {
-        translatedTitle = await translate(
-          complexSearchResult.results[i].title,
-          null,
-          "pt"
-        );
-        names.push(translatedTitle.translation);
-      } catch (error) {
-        console.error(error);
-        names.push(complexSearchResult.results[i].title);
-      }
-      
-      photos.push(
-        `https://spoonacular.com/recipeImages/${complexSearchResult.results[i].id}-636x393.jpg`
-      );
-      ids.push(complexSearchResult.results[i].id);
-    }
+    const resultInfo = await translateAndPush(complexSearchResult);
 
     res.render("recipes.ejs", {
-      names: names,
-      photos: photos,
-      ids: ids,
-      cuisine: cuisine,
-      cuisineBR: cuisineBR,
-      diet: diet,
-      dietBR: dietBR,
-      intolerances: intolerances,
-      intolerancesBR: intolerancesBR,
-      type: type,
-      typeBR: typeBR,
-      fwRecipes: "fw-bold text-success",
+      names: resultInfo.names,
+      photos: resultInfo.photos,
+      ids: resultInfo.ids,
+      renderInfo,
     });
   } catch (error) {
     console.error(error);
     res.render("recipes.ejs", {
-      cuisine: cuisine,
-      cuisineBR: cuisineBR,
-      diet: diet,
-      dietBR: dietBR,
-      intolerances: intolerances,
-      intolerancesBR: intolerancesBR,
-      type: type,
-      typeBR: typeBR,
-      fwRecipes: "fw-bold text-success",
+      renderInfo,
       errorMsg: "Não foram encontrados alimentos com essas especificações",
     });
   }
@@ -262,15 +227,11 @@ app.get("/info/:id", async (req, res) => {
   try {
     const index = req.params.id;
 
-    const responseDish = await axios.get(
-      `https://api.spoonacular.com/recipes/${index}/information?apiKey=726d686f92dd401d83de88ca56e86763`
-    );
-    const resultDish = responseDish.data;
+    const resultDish = await spoonCall.recipeInfo(index);
 
     let translatedTitle;
     try {
-      const toBeTranslatedTitle = await translate(resultDish.title, null, "pt");
-      translatedTitle = toBeTranslatedTitle.translation;
+      translatedTitle = await traduzir(resultDish.title, "pt");
     } catch (error) {
       translatedTitle = resultDish.title;
     }
@@ -280,98 +241,13 @@ app.get("/info/:id", async (req, res) => {
       image: resultDish.image,
     };
 
+    const result = await spoonCall.recipeWidget(index);
 
+    const ingredList = await ingredientParser(result);
 
-    const response = await axios.get(
-      `https://api.spoonacular.com/recipes/${index}/ingredientWidget.json?apiKey=726d686f92dd401d83de88ca56e86763`
-    );
-    const result = response.data.ingredients;
-    console.log(result);
+    const resultStep = await spoonCall.recipeInstructions(index);
 
-    const ingredList = [];
-
-    for (var i = 0; i < result.length; i++) {
-      let translatedName;
-      try {
-        const toBeTranslatedName = await translate(result[i].name, null, "pt");
-        translatedName = toBeTranslatedName.translation;
-      } catch (error) {
-        translatedName = result[i].name;
-      }
-      let translatedUnit;
-      let singular = result[i].amount.metric.value <= 1;
-
-      switch (result[i].amount.metric.unit) {
-        case "Tbsp":
-          translatedUnit = singular ? "Colher de Sopa" : "Colheres de Sopa";
-          break;
-
-        case "tsps":
-        case "tsp":
-          translatedUnit = singular ? "Colher de Chá" : "Colheres de Chá";
-          break;
-
-        case "pinch":
-          translatedUnit = singular ? "Pitada" : "Pitadas";
-          break;
-
-        case "g":
-          translatedUnit = "g";
-          break;
-
-        default:
-          try {
-            const toBeTranslatedUnit = translate(
-              result[i].amount.metric.unit,
-              null,
-              "pt"
-            );
-            translatedUnit = toBeTranslatedUnit.translation;
-          } catch (error) {
-            translatedUnit = result[i].amount.metric.unit;
-          }
-          break;
-      }
-
-      const value = result[i].amount.metric.value.toString();
-
-      const ingred = {
-        id: `${translatedName}_${translatedUnit}_${value}`,
-        name: translatedName,
-        unit: translatedUnit,
-        value: value,
-      };
-
-      if (!ingredList.find((ing) => ing.id == ingred.id)) {
-        ingredList.push(ingred);
-    }
-    }
-
-    const responseStep = await axios.get(
-      `https://api.spoonacular.com/recipes/${index}/analyzedInstructions?apiKey=726d686f92dd401d83de88ca56e86763`
-    );
-    const resultStep = responseStep.data;
-    console.log(resultStep);
-
-    const stepList = [];
-
-    for (var x = 0; x < resultStep.length; x++) {
-      for (var y = 0; y < resultStep[x].steps.length; y++) {
-        let translatedStep;
-        try {
-          const toBeTranslatedStep = await translate(
-            resultStep[x].steps[y].step,
-            null,
-            "pt"
-          );
-          translatedStep = toBeTranslatedStep.translation;
-        } catch (error) {
-          translatedStep = resultStep[x].steps[y].step;
-        }
-
-        stepList.push(translatedStep);
-      }
-    }
+    const stepList = await stepParser(resultStep);
 
     res.render("info.ejs", {
       stepList: stepList,
@@ -380,10 +256,151 @@ app.get("/info/:id", async (req, res) => {
     });
   } catch (error) {
     console.error("Failed to make request:", error.message);
-    res.redirect("/recipes")
+    res.redirect("/recipes");
   }
 });
 
 app.listen(port, () => {
   console.log("Running on " + port);
 });
+
+async function traduzir(text, lang) {
+  const translatedText = await translate(text, null, lang);
+  return translatedText.translation;
+}
+
+async function checarUnidade(unidade) {
+  let singular = unidade <= 1;
+
+  switch (unidade) {
+    case "Tbsp":
+      return singular ? "Colher de Sopa" : "Colheres de Sopa";
+
+    case "tsps":
+    case "tsp":
+      return singular ? "Colher de Chá" : "Colheres de Chá";
+
+    case "pinch":
+      return singular ? "Pitada" : "Pitadas";
+
+    case "g":
+      return "g";
+
+    default:
+      try {
+        return await traduzir(unidade, "pt");
+      } catch (error) {
+        return unidade;
+      }
+  }
+}
+
+const spoonCall = {
+  recipeComplex: async function (query, cuisine, diet, intolerances, type) {
+    const response = await axios.get(
+      `https://api.spoonacular.com/recipes/complexSearch?apiKey=${process.env.API_KEY}&query=${query}&cuisine=${cuisine}&diet=${diet}&intolerances=${intolerances}&type=${type}`
+    );
+    return response.data;
+  },
+
+  recipeImage: function (result, index) {
+    return `https://spoonacular.com/recipeImages/${result[index].id}-636x393.jpg`;
+  },
+
+  recipeInfo: async function (index) {
+    const responseDish = await axios.get(
+      `https://api.spoonacular.com/recipes/${index}/information?apiKey=${process.env.API_KEY}`
+    );
+    return responseDish.data;
+  },
+
+  recipeWidget: async function (index) {
+    const response = await axios.get(
+      `https://api.spoonacular.com/recipes/${index}/ingredientWidget.json?apiKey=${process.env.API_KEY}`
+    );
+    return response.data.ingredients;
+  },
+
+  recipeInstructions: async function (index) {
+    const responseStep = await axios.get(
+      `https://api.spoonacular.com/recipes/${index}/analyzedInstructions?apiKey=${process.env.API_KEY}`
+    );
+    return responseStep.data;
+  },
+};
+
+async function translateAndPush(complexSearchResult) {
+  const names = [];
+  const photos = [];
+  const ids = [];
+
+  for (let i = 0; i < complexSearchResult.results.length; i++) {
+    let translatedTitle;
+    try {
+      translatedTitle = await traduzir(
+        complexSearchResult.results[i].title,
+        "pt"
+      );
+      names.push(translatedTitle);
+    } catch (error) {
+      console.error(error);
+      names.push(complexSearchResult.results[i].title);
+    }
+
+    photos.push(spoonCall.recipeImage(complexSearchResult.results, i));
+    ids.push(complexSearchResult.results[i].id);
+  }
+
+  return { names, photos, ids };
+}
+
+async function ingredientParser(result) {
+  const ingredList = [];
+
+  for (var i = 0; i < result.length; i++) {
+    let translatedName;
+    try {
+      translatedName = await traduzir(result[i].name, "pt");
+    } catch (error) {
+      translatedName = result[i].name;
+    }
+
+    let translatedUnit;
+
+    translatedUnit = await checarUnidade(result[i].amount.metric.unit);
+
+    const value = result[i].amount.metric.value.toString();
+
+    const ingred = {
+      id: `${translatedName}_${translatedUnit}_${value}`,
+      name: translatedName,
+      unit: translatedUnit,
+      value: value,
+    };
+
+    if (!ingredList.find((ing) => ing.id == ingred.id)) {
+      ingredList.push(ingred);
+    }
+  }
+
+  return ingredList;
+}
+
+async function stepParser(resultStep) {
+  const stepList = [];
+
+  for (var x = 0; x < resultStep.length; x++) {
+    for (var y = 0; y < resultStep[x].steps.length; y++) {
+      let translatedStep;
+      try {
+        translatedStep = await traduzir(resultStep[x].steps[y].step, "pt");
+      } catch (error) {
+        translatedStep = resultStep[x].steps[y].step;
+      }
+
+      stepList.push(translatedStep);
+    }
+  }
+
+  return stepList;
+}

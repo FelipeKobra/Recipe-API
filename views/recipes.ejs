@@ -22,8 +22,8 @@
                         <div class="form-floating">
                             <select class="form-select col-6 col-lg-1 " id="floatingSelect1" name="cuisineRes" aria-label="Floating label cuisine">
                                 <option value="" selected></option>
-                                <% for( i=0; i<cuisine.length;i++) { %>
-                                    <option value="<%= cuisine[i] %>"><%= cuisineBR[i] %></option>
+                                <% for( i=0; i<renderInfo.cuisine.length;i++) { %>
+                                    <option value="<%= renderInfo.cuisine[i] %>"><%= renderInfo.cuisineBR[i] %></option>
                                 <% } %>
                             </select>
                         <label for="floatingSelect1">Cozinha</label>
@@ -34,8 +34,8 @@
                         <div class="form-floating">
                             <select class="form-select col-6 col-lg-1" id="floatingSelect2" name="dietRes" aria-label="Floating label diet">
                                 <option value="" selected></option>
-                                <% for( i=0; i<diet.length;i++) { %>
-                                    <option value="<%= diet[i] %>"><%= dietBR[i] %></option>
+                                <% for( i=0; i<renderInfo.diet.length;i++) { %>
+                                    <option value="<%= renderInfo.diet[i] %>"><%= renderInfo.dietBR[i] %></option>
                                 <% } %>
                             </select>
                         <label for="floatingSelect2">Dieta</label>
@@ -53,8 +53,8 @@
                         <div class="form-floating">
                             <select class="form-select col-6 col-lg-1" id="floatingSelect3" name="intolerancesRes" aria-label="Floating label intolerances">
                                 <option value="" selected></option>
-                                <% for( i=0; i<intolerances.length;i++) { %>
-                                    <option value="<%= intolerances[i] %>"><%= intolerancesBR[i] %></option>
+                                <% for( i=0; i<renderInfo.intolerances.length;i++) { %>
+                                    <option value="<%= renderInfo.intolerances[i] %>"><%= renderInfo.intolerancesBR[i] %></option>
                                 <% } %>
                             </select>
                         <label for="floatingSelect3">Intolerância</label>
@@ -65,8 +65,8 @@
                         <div class="form-floating">
                             <select class="form-select col-6 col-lg-1" id="floatingSelect4" name="typeRes" aria-label="Floating label type">
                                 <option value="" selected></option>
-                                <% for( i=0; i<type.length;i++) { %>
-                                    <option value="<%= type[i] %>"><%= typeBR[i] %></option>
+                                <% for( i=0; i<renderInfo.type.length;i++) { %>
+                                    <option value="<%= renderInfo.type[i] %>"><%= renderInfo.typeBR[i] %></option>
                                 <% } %>
                             </select>
                         <label for="floatingSelect4">Tipo</label>
